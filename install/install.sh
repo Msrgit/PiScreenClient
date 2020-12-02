@@ -7,7 +7,7 @@
 
 set -e
 set -E
-set -u
+#set -u
 
 #Default settings
 repo="msrgit/PiScreenClient"
