@@ -4,7 +4,7 @@
 repo="msrgit/PiScreenClient"
 
 #Get the latest version
-readonly PISCREEN_VERSION=
+readonly PISCREEN_VERSION=$(curl -s "https://api.github.com/repos/$repo/releases/latest" | grep -Po '"tag_name": "\K.*?(?=")' )
 
 # Define terminal colours
 readonly ANSI_RED="\033[0;31m"
