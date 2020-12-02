@@ -5,9 +5,9 @@
 #License: GNU General Public License v3.0
 #
 
-set -e
-set -E
-set -u
+#set -e
+#set -E
+#set -u
 
 #Default settings
 repo="msrgit/PiScreenClient"
@@ -37,7 +37,7 @@ while :; do
             upgrade=1
             ;;
         -v|--version)
-            printf "PiScreen Client v${PISCREEN_VERSION} - PiScreen Digital Signage"
+            printf "PiScreen Client v${PISCREEN_VERSION} - PiScreen Digital Signage\n"
             exit 1
             ;;
         -*|--*)
