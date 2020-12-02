@@ -102,7 +102,7 @@ function _configure_installation() {
 
 function _installation_complete() {
     _logit "${opt[0]}, version: $PISCRDS_VERSION, complete"
-    touch "$piscrds_logs/$PISCRDC_VERSION.installed"
+    touch "$piscrds_logs/$PISCRDS_VERSION.installed"
 }
 
 function _install_piscrds() {
