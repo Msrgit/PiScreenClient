@@ -25,7 +25,7 @@ webroot_dir="/var/www/html"
 git_source="https://github.com/$repo"
 
 #Get the latest version
-readonly PISCREEN_VERSION=$(curl -s "https://api.github.com/repos/$repo/releases/latest" | grep -Po '"tag_name": "\K.*?(?=")' )
+readonly PISCRDS_VERSION=$(curl -s "https://api.github.com/repos/$repo/releases/latest" | grep -Po '"tag_name": "\K.*?(?=")' )
 
 # Define terminal colours
 readonly ANSI_RED="\033[0;31m"
@@ -46,7 +46,7 @@ while :; do
             upgrade=1
             ;;
         -v|--version)
-            printf "PiScreen Client ${PISCREEN_VERSION} - PiScreen Digital Signage\n"
+            printf "PiScreen Client ${PISCRDS_VERSION} - PiScreen Digital Signage\n"
             exit 1
             ;;
         -*|--*)
@@ -74,7 +74,7 @@ function _logit() {
 function _display_welcome() {
 echo -e "${ANSI_RASPBERRY}\n"
 echo -e
-echo -e " 888888ba  oo .d88888b                        version: ${PISCREEN_VERSION}"
+echo -e " 888888ba  oo .d88888b                        version: ${PISCRDS_VERSION}"
 echo -e " 88    \`8b    88.    \"'"
 echo -e "a88aaaa8P' dP \`Y88888b. .d8888b. 88d888b. .d8888b. .d8888b. 88d888b."
 echo -e " 88        88       \`8b 88'  \`\"\" 88'  \`88 88ooood8 88ooood8 88'  \`88"
@@ -91,12 +91,18 @@ function _configure_installation() {
         opt=(Install Installing installation)
     fi
     mkdir -p "$piscrds_logs"
-    _logit "Configure ${opt[2]}"
+    _logit "Configure ${opt[2]}, version: $PISCRDS_VERSION"
+}
+
+function _installation_complete() {
+    _logit "${opt[0]}, version: $PISCRDS_VERSION, complete"
 }
 
 function _install_piscrds() {
-    _display_welcome;
-    _configure_installation;
+    _display_welcome
+    _configure_installation
+ 
+    _installation_complete
 }
 
 
