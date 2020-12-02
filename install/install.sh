@@ -67,7 +67,7 @@ UPDATE_URL="https:/raw.githubusercontent.com/$repo/$branch/"
 function _logit() {
     logname=`basename "$0"`
     logname="${logname%.*}"
-    echo -n "$(date) [$logname]: " >> ../logs/${logname}.log
+    echo -n "$(date) [$logname]: " >> $piscrds_logs/${logname}.log
     echo -e "$1" >> $piscrds_logs/${logname}.log
 }
 
