@@ -91,7 +91,7 @@ function _configure_installation() {
         opt=(Install Installing installation)
     fi
     mkdir -p "$piscrds_logs"
-    _logit "Configure ${opt(2)}"
+    _logit "Configure ${opt[2]}"
 }
 
 function _install_piscrds() {
