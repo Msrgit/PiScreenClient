@@ -16,11 +16,6 @@ readonly ANSI_RESET="\033[m"
 
 
 function _display_welcome() {
-echo -e "    ____  _ _____"                         
-echo -e "   / __ \\(_) ___/_____________  ___  ____" 
-echo -e "  / /_/ / /\__ \\/ ___/ ___/ _ \\/ _ \\/ __ \\"
-echo -e " / ____/ /___/ / /__/ /  /  __/  __/ / / /"
-echo -e "/_/   /_//____/\\___/_/   \\___/\\___/_/ /_/ "
 echo -e "${ANSI_RASPBERRY}\n"
 echo -e
 echo -e " 888888ba  oo .d88888b                        version: ${PISCREEN_VERSION}"
