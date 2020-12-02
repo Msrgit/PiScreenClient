@@ -23,7 +23,6 @@ function showit($message, $timeout=10, $type="info")
     $yad="--center --display=:0 --width=1000 --height=600 --fixed --title='PiScreen Message' ";
     $yad= $yad . "--text=\"". $title . " <span foreground='blue' font='32'>" . $message . "</span>\" ";
     $yad= $yad . "--timeout=" . $timeout ;
-   echo "$yad"; 
     exec("yad $yad", $result);
 }
 

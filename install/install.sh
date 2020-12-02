@@ -27,6 +27,12 @@ git_source="https://github.com/$repo"
 #Get the latest version
 readonly PISCRDS_VERSION=$(curl -s "https://api.github.com/repos/$repo/releases/latest" | grep -Po '"tag_name": "\K.*?(?=")' )
 
+#Do nothing if this version is already installed.
+if [ -e "$piscrds_logs/$PISCRDS_VERSION.installed" ]; then
+    touch "$piscrds_logs/$PISCRDS_VERSION.installed" 
+    exit
+fi
+
 # Define terminal colours
 readonly ANSI_RED="\033[0;31m"
 readonly ANSI_GREEN="\033[0;32m"
@@ -96,6 +102,7 @@ function _configure_installation() {
 
 function _installation_complete() {
     _logit "${opt[0]}, version: $PISCRDS_VERSION, complete"
+    touch "$piscrds_logs/$PISCRDC_VERSION.installed"
 }
 
 function _install_piscrds() {
