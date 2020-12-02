@@ -5,15 +5,24 @@
 #License: GNU General Public License v3.0
 #
 
-#set -e
-#set -E
-#set -u
+set -e
+set -E
+set -u
 
 #Default settings
 repo="msrgit/PiScreenClient"
 branch="master"
 default_yes=0
 upgrade=0
+
+piscrds_dir="/etc/piscrds"
+piscrds_sudoers="etc/sudoers.d/080_piscrds"
+piscrds_dnsmasq="etc/dnsmasq.d/080_piscrds.conf"
+piscrds_sysctl="/etc/sysctl.d/80_piscrds.conf"
+piscrds_logs="/home/pi/piscrds_logs"
+
+webroot_dir="/var/www/html"
+git_source="https://github.com/$repo"
 
 #Get the latest version
 readonly PISCREEN_VERSION=$(curl -s "https://api.github.com/repos/$repo/releases/latest" | grep -Po '"tag_name": "\K.*?(?=")' )
@@ -37,7 +46,7 @@ while :; do
             upgrade=1
             ;;
         -v|--version)
-            printf "PiScreen Client v${PISCREEN_VERSION} - PiScreen Digital Signage\n"
+            printf "PiScreen Client ${PISCREEN_VERSION} - PiScreen Digital Signage\n"
             exit 1
             ;;
         -*|--*)
@@ -53,6 +62,15 @@ done
 
 UPDATE_URL="https:/raw.githubusercontent.com/$repo/$branch/"
 
+
+
+function _logit() {
+    logname=`basename "$0"`
+    logname="${logname%.*}"
+    echo -n "$(date) [$logname]: " >> ../logs/${logname}.log
+    echo -e "$1" >> $piscrds_logs/${logname}.log
+}
+
 function _display_welcome() {
 echo -e "${ANSI_RASPBERRY}\n"
 echo -e
@@ -63,17 +81,24 @@ echo -e " 88        88       \`8b 88'  \`\"\" 88'  \`88 88ooood8 88ooood8 88'  \
 echo -e " 88        88 d8'   .8P 88.  ... 88       88.  ... 88.  ... 88    88"
 echo -e " dP        dP  Y88888P  \`88888P' dP       \`88888P' \`88888P' dP    dP"
 echo -e
-
 echo -e "${ANSI_RESET}\n"
 }
 
+function _configure_installation() {
+    if [ "$upgrade" == 1 ]; then
+        opt=(Upgrade Upgrading upgrade)
+    else
+        opt=(Install Installing installation)
+    fi
+    mkdir -p "$piscrds_logs"
+    _logit "Configure ${opt(2)}"
+}
 
-
-
-function _install_psclient() {
+function _install_piscrds() {
     _display_welcome;
+    _configure_installation;
 }
 
 
-_install_psclient
+_install_piscrds
 
