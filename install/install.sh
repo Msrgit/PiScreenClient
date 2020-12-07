@@ -30,7 +30,7 @@ readonly PISCRDS_VERSION=$(curl -s "https://api.github.com/repos/$repo/releases/
 #Do nothing if this version is already installed.
 if [ -e "$piscrds_logs/$PISCRDS_VERSION.installed" ]; then
     touch "$piscrds_logs/$PISCRDS_VERSION.installed" 
-    exit
+#    exit
 fi
 
 # Define terminal colours
@@ -101,18 +101,20 @@ function _configure_installation() {
 }
 
 function _update_system_packages() {
-    _logit("Updating system sources"
-    sudo apt update || _logit("Unable to update system sources")
+    _logit "Updating system sources"
+    sudo apt update || _logit "Unable to update system sources"
 }
 
 function _install_dependencies() {
-    sudo apt install $apt_option lighttpd git hostapd dnsmasq php7.0-cgi || _logit("Unable to install depencencies")
+    _logit "Installing dependencies"
+    sudo apt install $apt_option lighttpd git hostapd dnsmasq php7.0-cgi || _logit "Unable to install depencencies"
 }
 
 function _enable_php_lighttpd() {
+    _logit "Enabling php lighttpd"
     sudo lighttpd-enable-mod fastcgi-php
     sudo service lighttpd force-reload
-    sudo systemctl restart lighttpd.service || _logit("Unable to restart littpd")
+    sudo systemctl restart lighttpd.service || _logit "Unable to restart littpd"
 }
 
 function _installation_complete() {
