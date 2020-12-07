@@ -100,6 +100,21 @@ function _configure_installation() {
     _logit "Configure ${opt[2]}, version: $PISCRDS_VERSION"
 }
 
+function _update_system_packages() {
+    _logit("Updating system sources"
+    sudo apt update || _logit("Unable to update system sources")
+}
+
+function _install_dependencies() {
+    sudo apt install $apt_option lighttpd git hostapd dnsmasq php7.0-cgi || _logit("Unable to install depencencies")
+}
+
+function _enable_php_lighttpd() {
+    sudo lighttpd-enable-mod fastcgi-php
+    sudo service lighttpd force-reload
+    sudo systemctl restart lighttpd.service || _logit("Unable to restart littpd")
+}
+
 function _installation_complete() {
     _logit "${opt[0]}, version: $PISCRDS_VERSION, complete"
     touch "$piscrds_logs/$PISCRDS_VERSION.installed"
@@ -108,7 +123,11 @@ function _installation_complete() {
 function _install_piscrds() {
     _display_welcome
     _configure_installation
- 
+    _update_system_packages
+    _install_dependencies
+    _enable_php_lighttpd
+
+
     _installation_complete
 }
 

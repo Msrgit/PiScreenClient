@@ -1,0 +1,14 @@
+[Unit]
+Description=Piscreen Digital Signage Client
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/php main.php
+WorkingDirectory=/home/pi/PiScreenClient
+StandardOutput=inherit
+StandardError=inherit
+Restart=always
+User=pi
+
+[Install]
+WantedBy=multi-user.target
