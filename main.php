@@ -4,8 +4,12 @@ require_once "functions.php";
 require_once "messages.php";
 showit("Main starting - waiting",2);
 firstTime();
+while (! isOnline() ){
+
+
+}
 if (! isOnline() ) {
-    if (! getOnline() ){
+    while (! getOnline() ){
 
     }
 

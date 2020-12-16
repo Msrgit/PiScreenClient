@@ -14,6 +14,7 @@ repo="msrgit/PiScreenClient"
 branch="master"
 default_yes=0
 upgrade=0
+force_yes=0
 
 piscrds_dir="/etc/piscrds"
 piscrds_sudoers="etc/sudoers.d/080_piscrds"
@@ -26,12 +27,6 @@ git_source="https://github.com/$repo"
 
 #Get the latest version
 readonly PISCRDS_VERSION=$(curl -s "https://api.github.com/repos/$repo/releases/latest" | grep -Po '"tag_name": "\K.*?(?=")' )
-
-#Do nothing if this version is already installed.
-if [ -e "$piscrds_logs/$PISCRDS_VERSION.installed" ]; then
-    touch "$piscrds_logs/$PISCRDS_VERSION.installed" 
-#    exit
-fi
 
 # Define terminal colours
 readonly ANSI_RED="\033[0;31m"
@@ -47,6 +42,9 @@ while :; do
         -y|--yes|--apt-yes)
             default_yes=1
             apt_option="-y"
+            ;;
+        -f|--force)
+            force_yes=1
             ;;
         -u|--upgrade)
             upgrade=1
@@ -66,15 +64,32 @@ while :; do
     shift
 done
 
+#Do nothing if this version is already installed.
+if [ -e "$piscrds_logs/$PISCRDS_VERSION.installed" ]; then
+    touch "$piscrds_logs/$PISCRDS_VERSION.installed" 
+    if [ $force_yes == "0" ]; then #but only if we're not forcing it
+        exit
+    fi
+fi
 UPDATE_URL="https:/raw.githubusercontent.com/$repo/$branch/"
 
 
 
 function _logit() {
+    flag="${2:-0}"
+    case $flag in
+        0)
+            $start="${ANSI_GREEN}"
+            ;;
+        1)
+            $start="${ANSI_ERROR}"
+            ;;
+    esac
     logname=`basename "$0"`
     logname="${logname%.*}"
     echo -n "$(date) [$logname]: " >> $piscrds_logs/${logname}.log
     echo -e "$1" >> $piscrds_logs/${logname}.log
+    echo -e "$start$(date) [$logname]: $1${ANSI_RESET}"
 }
 
 function _display_welcome() {
@@ -102,19 +117,35 @@ function _configure_installation() {
 
 function _update_system_packages() {
     _logit "Updating system sources"
-    sudo apt update || _logit "Unable to update system sources"
+    sudo apt update || _logit "Unable to update system sources" 1
+    sudo apt full-update || _logit "Full-Update not done" 1
 }
 
 function _install_dependencies() {
     _logit "Installing dependencies"
-    sudo apt install $apt_option lighttpd git hostapd dnsmasq php7.0-cgi || _logit "Unable to install depencencies"
+    sudo apt install $apt_option lighttpd git hostapd dnsmasq php7.0-cgi || _logit "Unable to install depencencies" 1
 }
 
 function _enable_php_lighttpd() {
     _logit "Enabling php lighttpd"
-    sudo lighttpd-enable-mod fastcgi-php
+    sudo lighttpd-enable-mod fastcgi-php || _logit "lighttpd php already enabled"
     sudo service lighttpd force-reload
-    sudo systemctl restart lighttpd.service || _logit "Unable to restart littpd"
+    sudo systemctl restart lighttpd.service || _logit "Unable to restart littpd" 1
+}
+
+function _create_piscrds_directories() {
+
+    _logit "Creating PiScreen directories"
+    if [ -d "$piscrds_dir" ]; then
+        sudo mv $piscrds_dir "$piscrds_dir.`date +%F-%R`" || _logit "Couldn't move old '$piscrds_dir' out of the way" 1
+    fi
+    _logit "Creating backup and network directories in '$piscrds_dir'"
+    mkdir -p "$piscrds_dir/backups"
+    mkdir -p "$piscrds_dir/networking"
+    _logit "Adding dhcpdc.conf as base configuration"
+    cat /etc/dhcpcd.conf | sudo tee -a "$piscrds_dir"/networking/defaults > /dev/null
+    _logit "Changing ownership of $piscrds_dir"
+    sudo chown -R $piscrds_user:$piscrds_user "$piscrds_dir" || _logit "Couldn't change file ownership for '$piscrds_dir'"
 }
 
 function _installation_complete() {
